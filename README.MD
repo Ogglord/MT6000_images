@@ -4,6 +4,5 @@ These are built using https://github.com/Ogglord/openwrt-builder and based on pe
 
 Note to self - I executed this to be able to push large commits
 ```bash
-git config --global http.version HTTP/1.1
-git config --global http.postBuffer 1572864000
+git config --global http.postBuffer 572864000
 ```
