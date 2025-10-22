@@ -1,4 +1,0 @@
-# Put your custom commands here that should be executed once
-# the system init finished. By default this file does nothing.
-ethtool -K eth1 rx-udp-gro-forwarding on rx-gro-list off
-exit 0
