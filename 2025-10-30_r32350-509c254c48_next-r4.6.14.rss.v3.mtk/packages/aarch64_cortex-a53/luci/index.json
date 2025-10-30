@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "architecture": "aarch64_cortex-a53",
+  "packages": {
+    "liblucihttp-ucode": "2023.03.15~9b5b683f-r1",
+    "liblucihttp": "2023.03.15~9b5b683f-r1",
+    "luci-app-adblock-fast": "1.2.0-r20",
+    "luci-app-advanced": "1.0.3-r1",
+    "luci-app-firewall": "25.299.38937~cd40017",
+    "luci-app-package-manager": "25.299.38937~cd40017",
+    "luci-app-pbr": "1.2.1-r21",
+    "luci-app-sqm": "25.299.38937~cd40017",
+    "luci-app-wol": "25.299.38937~cd40017",
+    "luci-base": "25.299.38937~cd40017",
+    "luci-lib-uqr": "25.299.38937~cd40017",
+    "luci-light": "25.299.38937~cd40017",
+    "luci-mod-admin-full": "25.299.38937~cd40017",
+    "luci-mod-network": "25.299.38937~cd40017",
+    "luci-mod-status": "25.299.38937~cd40017",
+    "luci-mod-system": "25.299.38937~cd40017",
+    "luci-proto-ipv6": "25.299.38937~cd40017",
+    "luci-proto-ppp": "25.299.38937~cd40017",
+    "luci-proto-wireguard": "25.299.38937~cd40017",
+    "luci-ssl-openssl": "25.299.38937~cd40017",
+    "luci-theme-bootstrap": "25.299.38937~cd40017",
+    "rpcd-mod-luci": "20240305-r1",
+    "rpcd-mod-rrdns": "20170710",
+    "ucode-mod-html": "1"
+  }
+}
