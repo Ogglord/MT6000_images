@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Remove the APK migration message from /etc/profile
+
+PROFILE="/etc/profile"
+
+if [ -f "$PROFILE" ]; then
+    # Remove the entire APK message block
+    sed -i '/^if \[ -x \/usr\/bin\/apk \]; then$/,/^fi$/d' "$PROFILE"
+fi
+
+exit 0

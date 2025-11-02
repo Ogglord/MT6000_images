@@ -15,13 +15,13 @@ if [ -x /usr/local/bin/build-info ]; then
     /usr/local/bin/build-info
 fi
 
-# Public IP
-echo -n "Public IP: "
-PUBLIC_IP=$(wget -qO- --timeout=3 ifconfig.me 2>/dev/null || curl -s --max-time 3 ifconfig.me 2>/dev/null)
-if [ -n "$PUBLIC_IP" ]; then
-    echo "$PUBLIC_IP"
+# eth1 IP
+echo -n "eth1 IP: "
+ETH1_IP=$(ip -4 addr show eth1 2>/dev/null | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
+if [ -n "$ETH1_IP" ]; then
+    echo "$ETH1_IP"
 else
-    echo "Unable to fetch"
+    echo "Not configured"
 fi
 
 echo ""
