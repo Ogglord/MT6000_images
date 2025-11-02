@@ -1,0 +1,205 @@
+# /etc/zsh/zshrc - System-wide zsh configuration for OpenWrt
+# Lightweight configuration with autocompletion and useful aliases
+
+# History configuration
+HISTFILE=~/.zsh_history
+HISTSIZE=1000
+SAVEHIST=1000
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE
+setopt SHARE_HISTORY
+setopt APPEND_HISTORY
+
+# Directory navigation
+setopt AUTO_CD              # Type directory name to cd
+setopt AUTO_PUSHD           # Make cd push old dir onto stack
+setopt PUSHD_IGNORE_DUPS    # Don't push duplicates
+setopt PUSHD_SILENT         # Don't print directory stack
+
+# Completion system
+autoload -Uz compinit
+compinit -d ~/.zcompdump
+
+# Completion options
+setopt COMPLETE_IN_WORD     # Complete from both ends of word
+setopt ALWAYS_TO_END        # Move cursor to end after completion
+setopt AUTO_MENU            # Show completion menu on tab
+setopt AUTO_LIST            # List choices on ambiguous completion
+setopt MENU_COMPLETE        # Insert first match immediately
+unsetopt FLOW_CONTROL       # Disable start/stop characters (^S/^Q)
+
+# Completion styling
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' # Case insensitive
+zstyle ':completion:*' list-colors ''
+zstyle ':completion:*' special-dirs true
+zstyle ':completion:*' squeeze-slashes true
+
+# Prompt
+PROMPT='%F{green}%n@%m%f:%F{blue}%~%f%# '
+RPROMPT='%F{yellow}[%?]%f'  # Show exit code on right
+
+# Key bindings (emacs style)
+bindkey -e
+bindkey '^[[A' history-beginning-search-backward  # Up arrow
+bindkey '^[[B' history-beginning-search-forward   # Down arrow
+bindkey '^[[H' beginning-of-line                  # Home
+bindkey '^[[F' end-of-line                        # End
+bindkey '^[[3~' delete-char                       # Delete
+bindkey '^[[Z' reverse-menu-complete              # Shift-Tab
+
+# Plugin directory
+ZSH_PLUGIN_DIR="/usr/share/zsh/plugins"
+
+# Function to install zsh plugins
+install_zsh_plugins() {
+    local plugin_dir="$1"
+    local plugin_name="$2"
+    local repo_url="$3"
+
+    if [ ! -d "$plugin_dir/$plugin_name" ]; then
+        echo "Installing $plugin_name..."
+        mkdir -p "$plugin_dir"
+        if command -v git &> /dev/null; then
+            git clone --depth=1 "$repo_url" "$plugin_dir/$plugin_name" 2>/dev/null
+        else
+            echo "Git not found. Skipping $plugin_name installation."
+            return 1
+        fi
+    fi
+}
+
+# Install plugins on first run (check for marker file)
+if [ ! -f ~/.zsh_plugins_installed ]; then
+    # Only attempt installation if we have write access to plugin directory
+    if [ -w /usr/share ] || mkdir -p "$ZSH_PLUGIN_DIR" 2>/dev/null; then
+        install_zsh_plugins "$ZSH_PLUGIN_DIR" "zsh-autosuggestions" \
+            "https://github.com/zsh-users/zsh-autosuggestions.git"
+        install_zsh_plugins "$ZSH_PLUGIN_DIR" "zsh-syntax-highlighting" \
+            "https://github.com/zsh-users/zsh-syntax-highlighting.git"
+        touch ~/.zsh_plugins_installed 2>/dev/null
+    else
+      echo "No permission to install plugins to /usr/share. Skipping!"
+    fi
+fi
+
+# Autosuggestions
+if [ -f "$ZSH_PLUGIN_DIR/zsh-autosuggestions/zsh-autosuggestions.zsh" ]; then
+    source "$ZSH_PLUGIN_DIR/zsh-autosuggestions/zsh-autosuggestions.zsh"
+    ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
+fi
+
+# Syntax highlighting (must be last)
+if [ -f "$ZSH_PLUGIN_DIR/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]; then
+    source "$ZSH_PLUGIN_DIR/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+fi
+
+# Aliases - General
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias ~='cd ~'
+alias -- -='cd -'
+
+# Aliases - ls variations
+alias l='ls -lah'
+alias ll='ls -lh'
+alias la='ls -lAh'
+alias lt='ls -lth'      # Sort by modification time
+alias lz='ls -lSh'      # Sort by size
+
+# Aliases - Safety
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+
+# Aliases - Grep with color
+alias grep='grep --color=auto'
+alias egrep='egrep --color=auto'
+alias fgrep='fgrep --color=auto'
+
+# Aliases - Network
+alias ports='netstat -tulanp'
+alias listening='netstat -lntup'
+alias ping='ping -c 5'
+alias fastping='ping -c 100 -i 0.2'
+
+# Aliases - OpenWrt specific
+alias fw='fw3'
+alias uci-show='uci show'
+alias uci-commit='uci commit && reload_config'
+alias log='logread'
+alias logf='logread -f'
+alias syslog='logread -e'
+alias wifi-scan='iwinfo wlan0 scan'
+alias wifi-status='wifi status'
+alias net-restart='service network restart'
+alias led-on='echo 1 > /sys/class/leds/*/brightness'
+alias led-off='echo 0 > /sys/class/leds/*/brightness'
+
+# Aliases - System monitoring
+alias mem='free -m'
+alias cpu='top -n 1'
+alias df='df -h'
+alias du='du -h'
+alias ps='ps aux'
+alias psg='ps aux | grep -v grep | grep -i -e VSZ -e'
+
+# Aliases - Git (if available)
+if command -v git &> /dev/null; then
+    alias g='git'
+    alias gs='git status'
+    alias ga='git add'
+    alias gc='git commit'
+    alias gp='git push'
+    alias gl='git log --oneline'
+    alias gd='git diff'
+    alias gb='git branch'
+    alias gco='git checkout'
+fi
+
+# Functions
+# Extract various archive types
+extract() {
+    if [ -f "$1" ]; then
+        case "$1" in
+            *.tar.bz2)   tar xjf "$1"     ;;
+            *.tar.gz)    tar xzf "$1"     ;;
+            *.bz2)       bunzip2 "$1"     ;;
+            *.gz)        gunzip "$1"      ;;
+            *.tar)       tar xf "$1"      ;;
+            *.tbz2)      tar xjf "$1"     ;;
+            *.tgz)       tar xzf "$1"     ;;
+            *.zip)       unzip "$1"       ;;
+            *.Z)         uncompress "$1"  ;;
+            *.7z)        7z x "$1"        ;;
+            *)           echo "'$1' cannot be extracted via extract()" ;;
+        esac
+    else
+        echo "'$1' is not a valid file"
+    fi
+}
+
+# Quick directory creation and navigation
+mkcd() {
+    mkdir -p "$1" && cd "$1"
+}
+
+# Find process by name
+psgrep() {
+    ps aux | grep -v grep | grep -i -e VSZ -e "$@"
+}
+
+# Network info
+myip() {
+    echo "Internal IP:"
+    ip addr show | grep "inet " | grep -v 127.0.0.1 | awk '{print $2}'
+    if command -v curl &> /dev/null; then
+        echo "External IP:"
+        curl -s ifconfig.me
+        echo
+    fi
+}
+
+# Source user's local zshrc if it exists
+[ -f ~/.zshrc ] && source ~/.zshrc

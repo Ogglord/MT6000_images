@@ -1,0 +1,12 @@
+# Firmware Build Information
+BUILD_DATE="2025-10-31 22:47:05 UTC"
+BUILD_TIMESTAMP="1761950825"
+BUILD_HOST="openwrt-builder"
+BUILD_USER="builder"
+BUILD_MACHINE="openwrt-builder"
+BUILD_OS="Linux 6.8.0-86-generic"
+GIT_REPO="https://github.com/pesa1234/openwrt.git"
+GIT_BRANCH="next-r4.6.14.rss.mtk"
+GIT_COMMIT="509c254c48"
+GIT_COMMIT_FULL="509c254c48d77394b8da04e7bd2c58f11dbf638c"
+OPENWRT_VERSION=""

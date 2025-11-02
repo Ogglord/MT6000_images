@@ -1,0 +1,7 @@
+# Put your custom commands here that should be executed once
+# the system init finished. By default this file does nothing.
+# Uneven distribution is by design in DSA setups, where queues are assigned per switch port and not load-balanced via hashing as used with tc-mq
+tc qdisc replace dev eth0 root fq_codel
+# Resolve rx errors via ethtool -S <iface>
+for ETH in eth0 eth1; do ethtool -K $ETH rx off; done
+exit 0
