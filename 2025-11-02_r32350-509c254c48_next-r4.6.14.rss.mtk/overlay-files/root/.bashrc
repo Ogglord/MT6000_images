@@ -7,6 +7,9 @@ case $- in
       *) return;;
 esac
 
+# set history file, right
+export HISTFILE="$HOME/.bash_history"
+
 # Bash-it installation directory
 export BASH_IT="$HOME/.bash_it"
 

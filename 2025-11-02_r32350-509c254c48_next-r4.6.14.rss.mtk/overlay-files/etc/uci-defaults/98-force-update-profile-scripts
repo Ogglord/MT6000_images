@@ -1,0 +1,23 @@
+#!/bin/sh
+# Force update profile scripts from ROM to overlay
+# This ensures bug fixes in firmware updates are applied even when
+# sysupgrade preserves /etc files
+
+# Update motd.sh if it exists in ROM
+if [ -f /rom/etc/profile.d/motd.sh ]; then
+    cp -f /rom/etc/profile.d/motd.sh /etc/profile.d/motd.sh
+    chmod +x /etc/profile.d/motd.sh
+fi
+
+# Update zsh.sh if it exists in ROM
+if [ -f /rom/etc/profile.d/zsh.sh ]; then
+    cp -f /rom/etc/profile.d/zsh.sh /etc/profile.d/zsh.sh
+    chmod +x /etc/profile.d/zsh.sh
+fi
+
+# Update zsh.sh if it exists in ROM
+if [ -f /rom/etc/ssh/sshd_config ]; then
+    cp -f /rom/etc/ssh/sshd_config /etc/ssh/sshd_config
+fi
+
+exit 0
