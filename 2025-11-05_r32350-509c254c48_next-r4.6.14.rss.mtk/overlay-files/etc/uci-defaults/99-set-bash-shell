@@ -1,0 +1,27 @@
+#!/bin/sh
+# Set bash as the default shell for root user on first boot
+# This script runs once and is automatically deleted after successful execution
+
+# Check if bash is installed and executable
+if [ ! -x /bin/bash ]; then
+    logger -t "uci-defaults" "Warning: /bin/bash not found, keeping default shell"
+    exit 0
+fi
+
+# Check if root already has bash as shell (idempotent check)
+if grep -q "^root:.*:/bin/bash$" /etc/passwd; then
+    logger -t "uci-defaults" "Root shell already set to /bin/bash"
+    exit 0
+fi
+
+# Change root shell from /bin/ash to /bin/bash in /etc/passwd
+sed -i 's|^root:\([^:]*\):\([^:]*\):\([^:]*\):\([^:]*\):\([^:]*\):/bin/ash$|root:\1:\2:\3:\4:\5:/bin/bash|' /etc/passwd
+
+# Verify the change was successful
+if grep -q "^root:.*:/bin/bash$" /etc/passwd; then
+    logger -t "uci-defaults" "Successfully changed root shell to /bin/bash"
+    exit 0
+else
+    logger -t "uci-defaults" "Warning: Failed to change root shell to /bin/bash"
+    exit 1
+fi

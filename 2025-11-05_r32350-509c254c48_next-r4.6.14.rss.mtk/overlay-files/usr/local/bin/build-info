@@ -1,0 +1,29 @@
+#!/bin/sh
+# Display firmware build information
+
+if [ -f /etc/build-info ]; then
+    echo "=== Firmware Build Information ==="
+    . /etc/build-info
+
+    echo "Built on:        $BUILD_DATE"
+    echo "Build host:      $BUILD_HOST"
+    echo "Build user:      $BUILD_USER"
+    echo "Build machine:   $BUILD_MACHINE"
+    echo "Build OS:        $BUILD_OS"
+    echo "Git repository:  $GIT_REPO"
+    echo "Git branch:      $GIT_BRANCH"
+    echo "Git commit:      $GIT_COMMIT"
+
+    if [ -n "$BUILD_TIMESTAMP" ]; then
+        CURRENT_TIME=$(date +%s)
+        AGE_SECONDS=$((CURRENT_TIME - BUILD_TIMESTAMP))
+        AGE_DAYS=$((AGE_SECONDS / 86400))
+        echo "Firmware age:    $AGE_DAYS days"
+    fi
+
+    echo ""
+    echo "OpenWrt version: $(grep DISTRIB_DESCRIPTION /etc/openwrt_release 2>/dev/null | cut -d"'" -f2)"
+    echo "Kernel version:  $(uname -r)"
+else
+    echo "Build information not available"
+fi

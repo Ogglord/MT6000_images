@@ -1,0 +1,25 @@
+#!/bin/sh
+# Configure SSH settings via sshd_config
+# Ensures PasswordAuthentication and AuthorizedKeysFile are set correctly
+# This script runs once and is automatically deleted after successful execution
+
+SSHD_CONFIG="/etc/ssh/sshd_config"
+
+# Check if sshd_config exists
+if [ ! -f "$SSHD_CONFIG" ]; then
+    logger -t "uci-defaults" "Error: sshd_config not found at $SSHD_CONFIG"
+    exit 1
+fi
+
+# Remove any existing PasswordAuthentication lines (commented or not)
+sed -i '/^[[:space:]]*#*[[:space:]]*PasswordAuthentication/d' "$SSHD_CONFIG"
+
+# Remove any existing AuthorizedKeysFile lines (commented or not)
+sed -i '/^[[:space:]]*#*[[:space:]]*AuthorizedKeysFile/d' "$SSHD_CONFIG"
+
+# Add the required settings
+echo "PasswordAuthentication yes" >> "$SSHD_CONFIG"
+echo "AuthorizedKeysFile	.ssh/authorized_keys /etc/dropbear/authorized_keys" >> "$SSHD_CONFIG"
+
+logger -t "uci-defaults" "SSH configuration updated successfully"
+exit 0

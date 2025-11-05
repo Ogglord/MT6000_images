@@ -1,0 +1,8 @@
+# Put your custom commands here that should be executed once
+# the system init finished. By default this file does nothing.
+#
+# Note: Network tweaks (tc qdisc, ethtool) are now handled by
+# /etc/init.d/network-tweaks service which runs on each boot
+# with proper error handling.
+
+exit 0

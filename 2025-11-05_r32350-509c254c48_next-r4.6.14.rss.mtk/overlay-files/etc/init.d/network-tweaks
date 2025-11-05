@@ -1,0 +1,39 @@
+#!/bin/sh /etc/rc.common
+# Network tweaks init script
+# Applies network optimizations on each boot
+# Safe to run - won't break boot if interfaces don't exist
+
+START=96
+
+boot() {
+	start
+}
+
+start() {
+	local ETH
+	
+	# Apply fq_codel qdisc to eth0 if it exists
+	if ip link show eth0 >/dev/null 2>&1; then
+		if command -v tc >/dev/null 2>&1; then
+			tc qdisc replace dev eth0 root fq_codel 2>/dev/null || {
+				logger -t network-tweaks "Warning: Failed to set fq_codel on eth0"
+			}
+		else
+			logger -t network-tweaks "Warning: tc command not found"
+		fi
+	fi
+	
+	# Disable RX checksum offload on eth0 and eth1 if they exist
+	if command -v ethtool >/dev/null 2>&1; then
+		for ETH in eth0 eth1; do
+			if ip link show "$ETH" >/dev/null 2>&1; then
+				ethtool -K "$ETH" rx off 2>/dev/null || {
+					logger -t network-tweaks "Warning: Failed to disable RX offload on $ETH"
+				}
+			fi
+		done
+	else
+		logger -t network-tweaks "Warning: ethtool command not found"
+	fi
+}
+

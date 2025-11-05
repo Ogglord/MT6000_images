@@ -1,0 +1,53 @@
+#!/bin/sh
+# Check if uci-defaults scripts ran successfully
+# Usage: check-uci-defaults
+
+echo "=== Checking uci-defaults scripts ==="
+echo ""
+
+# Check if scripts still exist
+if [ -d /etc/uci-defaults ]; then
+    remaining=$(ls -A /etc/uci-defaults 2>/dev/null | wc -l)
+    if [ "$remaining" -eq 0 ]; then
+        echo "✅ All uci-defaults scripts have been executed and removed"
+    else
+        echo "⚠️  $remaining script(s) still remain in /etc/uci-defaults/:"
+        ls -1 /etc/uci-defaults/
+        echo ""
+        echo "These scripts either failed or haven't run yet."
+        echo "Check logs with: logread | grep uci-defaults"
+    fi
+else
+    echo "✅ /etc/uci-defaults/ directory doesn't exist (all scripts ran)"
+fi
+
+echo ""
+echo "=== Checking script effects ==="
+echo ""
+
+# Check bash shell script effect
+if grep -q "^root:.*:/bin/bash$" /etc/passwd 2>/dev/null; then
+    echo "✅ Root shell is set to /bin/bash"
+else
+    echo "❌ Root shell is NOT set to /bin/bash"
+    echo "   Current: $(grep "^root:" /etc/passwd | cut -d: -f7)"
+fi
+
+# Check SSH config script effect
+if grep -q "^PasswordAuthentication yes$" /etc/ssh/sshd_config 2>/dev/null; then
+    echo "✅ SSH PasswordAuthentication is set to yes"
+else
+    echo "❌ SSH PasswordAuthentication not found or not set correctly"
+fi
+
+if grep -q "^AuthorizedKeysFile.*dropbear" /etc/ssh/sshd_config 2>/dev/null; then
+    echo "✅ SSH AuthorizedKeysFile includes dropbear path"
+else
+    echo "❌ SSH AuthorizedKeysFile not configured correctly"
+fi
+
+echo ""
+echo "=== Recent uci-defaults log messages ==="
+logread | grep -i "uci-defaults" | tail -10 || echo "No uci-defaults log messages found"
+
+
